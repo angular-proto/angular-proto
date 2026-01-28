@@ -1,9 +1,7 @@
-import nx from '@nx/eslint-plugin';
+import baseConfig from './eslint.base.config.mjs';
 
 export default [
-  ...nx.configs['flat/base'],
-  ...nx.configs['flat/typescript'],
-  ...nx.configs['flat/javascript'],
+  ...baseConfig,
   {
     ignores: ['**/dist', '**/out-tsc', '**/vitest.config.*.timestamp*'],
   },
@@ -17,12 +15,67 @@ export default [
           allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
           depConstraints: [
             {
-              sourceTag: '*',
-              onlyDependOnLibsWithTags: ['*'],
+              sourceTag: 'core',
+              onlyDependOnLibsWithTags: [],
+            },
+            {
+              sourceTag: 'primitives',
+              onlyDependOnLibsWithTags: ['core'],
+            },
+            {
+              sourceTag: 'app',
+              onlyDependOnLibsWithTags: ['core', 'primitives'],
             },
           ],
         },
       ],
+      '@typescript-eslint/array-type': ['warn'],
+      '@typescript-eslint/consistent-type-imports': 'off',
+      '@typescript-eslint/consistent-indexed-object-style': 'off',
+      '@typescript-eslint/consistent-type-assertions': 'warn',
+      '@typescript-eslint/consistent-type-definitions': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-member-accessibility': ['error', { accessibility: 'no-public' }],
+      '@typescript-eslint/naming-convention': [
+        'warn',
+        {
+          selector: 'variable',
+          format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
+          leadingUnderscore: 'allow',
+        },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
+      '@typescript-eslint/no-empty-function': 'warn',
+      '@typescript-eslint/no-empty-interface': 'off',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-inferrable-types': 'warn',
+      '@typescript-eslint/no-shadow': 'warn',
+      eqeqeq: 'error',
+      curly: 'error',
+      'guard-for-in': 'error',
+      'no-bitwise': 'error',
+      'no-new-wrappers': 'error',
+      'no-useless-concat': 'error',
+      'no-var': 'error',
+      'one-var': ['error', 'never'],
+      'prefer-arrow-callback': 'error',
+      'prefer-const': 'error',
+      'sort-imports': [
+        'error',
+        {
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+          allowSeparatedGroups: true,
+        },
+      ],
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
     },
   },
   {

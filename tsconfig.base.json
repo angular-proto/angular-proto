@@ -10,11 +10,21 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": ["esnext", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@ng-proto/core": ["src/core/src/index.ts"],
+      "@ng-proto/core/focus": ["src/core/focus/src/index.ts"],
+      "@ng-proto/core/focus-visible": ["src/core/focus-visible/src/index.ts"],
+      "@ng-proto/core/hover": ["src/core/hover/src/index.ts"],
+      "@ng-proto/core/press": ["src/core/press/src/index.ts"],
+      "@ng-proto/core/disable": ["src/core/disable/src/index.ts"],
+      "@ng-proto/primitives": ["src/primitives/src/index.ts"],
+      "@ng-proto/core/button": ["src/core/button/src/index.ts"],
+      "@ng-proto/primitives/button": ["src/primitives/button/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
