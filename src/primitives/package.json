@@ -1,5 +1,5 @@
 {
-  "name": "@ng-proto/primitives",
+  "name": "@angular-proto/primitives",
   "version": "0.0.1",
   "peerDependencies": {
     "@angular/core": "^21.1.0",

@@ -45,7 +45,7 @@ export function controlledInput<S extends InputSignalWithTransform<any, any>>(so
     // Dev-mode warning when controlledInput is called multiple times
     if (isDevMode()) {
       console.warn(
-        `[ng-proto] controlledInput() was called on an already controlled signal. ` +
+        `[angular-proto] controlledInput() was called on an already controlled signal. ` +
           `This may indicate a bug - each signal should only be wrapped once.`,
       );
     }

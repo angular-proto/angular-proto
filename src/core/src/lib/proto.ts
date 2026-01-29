@@ -1,4 +1,17 @@
 import {
+  controlledInput,
+  ControlledInput,
+  deepMerge,
+  DeepPartial,
+  injectElementRef,
+  isDev,
+  isFunction,
+  isInputSignal,
+  isObject,
+  MaybeFn,
+  uniqueId,
+} from '@angular-proto/core/utils';
+import {
   DestroyRef,
   ElementRef,
   inject,
@@ -13,19 +26,6 @@ import {
   Signal,
   WritableSignal,
 } from '@angular/core';
-import {
-  controlledInput,
-  ControlledInput,
-  deepMerge,
-  DeepPartial,
-  injectElementRef,
-  isDev,
-  isFunction,
-  isInputSignal,
-  isObject,
-  MaybeFn,
-  uniqueId,
-} from '@ng-proto/core/utils';
 import {
   createProtoAncestry,
   PROTO_ANCESTRY_CHAIN,
@@ -228,7 +228,7 @@ export function createProto<T extends object, C extends object = object>(
     if (proto()) {
       if (isDev()) {
         throw new Error(
-          `[ng-proto] ${name}Proto.initState() was called more than once. ` +
+          `[angular-proto] ${name}Proto.initState() was called more than once. ` +
             `initState() should only be called once in the constructor.`,
         );
       }
@@ -251,7 +251,7 @@ export function createProto<T extends object, C extends object = object>(
     // Dev-mode warning if no inputs found
     if (isDev() && inputCount === 0) {
       console.warn(
-        `[ng-proto] ${name}Proto.initState() called but no input signals found. ` +
+        `[angular-proto] ${name}Proto.initState() called but no input signals found. ` +
           `Did you forget to declare inputs with input()?`,
       );
     }

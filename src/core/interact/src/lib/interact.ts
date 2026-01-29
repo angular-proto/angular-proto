@@ -1,7 +1,12 @@
+import { createProto } from '@angular-proto/core';
+import {
+  injectElementRef,
+  listener,
+  Obj,
+  supportsDisabledAttribute,
+} from '@angular-proto/core/utils';
 import type { BooleanInput, NumberInput } from '@angular/cdk/coercion';
 import { booleanAttribute, computed, Directive, input, numberAttribute } from '@angular/core';
-import { createProto } from '@ng-proto/core';
-import { injectElementRef, listener, Obj, supportsDisabledAttribute } from '@ng-proto/core/utils';
 
 export const ProtoInteractEvents = new Set([
   'click',

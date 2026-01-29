@@ -1,15 +1,15 @@
 // import { computed, Directive, effect, input } from '@angular/core';
-// import { createProto } from '@ng-proto/core';
-// import { ProtoButton } from '@ng-proto/core/button';
-// import { ProtoFocusVisible } from '@ng-proto/core/focus-visible';
-// import { ProtoHover } from '@ng-proto/core/hover';
-// import { ProtoPress } from '@ng-proto/core/press';
+// import { createProto } from '@angular-proto/core';
+// import { ProtoButton } from '@angular-proto/core/button';
+// import { ProtoFocusVisible } from '@angular-proto/core/focus-visible';
+// import { ProtoHover } from '@angular-proto/core/hover';
+// import { ProtoPress } from '@angular-proto/core/press';
 // import {
 //   injectElementRef,
 //   isNativeAnchorTag,
 //   isNativeButtonTag,
 //   isNativeInputTag,
-// } from '@ng-proto/core/utils';
+// } from '@angular-proto/core/utils';
 
 // export const ButtonPrimitive = createProto({ name: 'Button', type: () => PrimitiveButton });
 

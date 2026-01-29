@@ -1,12 +1,12 @@
 // import { computed, Directive, input } from '@angular/core';
-// import { createProto } from '@ng-proto/core';
-// import { InteractProto, ProtoInteract } from '@ng-proto/core/interact';
+// import { createProto } from '@angular-proto/core';
+// import { InteractProto, ProtoInteract } from '@angular-proto/core/interact';
 // import {
 //   injectElementRef,
 //   isNativeAnchorTag,
 //   isNativeButtonTag,
 //   isNativeInputTag,
-// } from '@ng-proto/core/utils';
+// } from '@angular-proto/core/utils';
 
 // export const ButtonProto = createProto({ name: 'Button', type: () => ProtoButton });
 

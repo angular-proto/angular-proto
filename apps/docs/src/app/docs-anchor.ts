@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 import {
   type AnchorPlacement,
   ProtoAnchor,
   ProtoAnchorArrow,
   ProtoAnchorTarget,
-} from '@ng-proto/core/anchor';
-import { ProtoHover } from '@ng-proto/core/hover';
+} from '@angular-proto/core/anchor';
+import { ProtoHover } from '@angular-proto/core/hover';
+import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 
 // ============================================================================
 // 1. Basic Tooltip Example

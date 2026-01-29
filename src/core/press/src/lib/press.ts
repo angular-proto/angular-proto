@@ -1,3 +1,5 @@
+import { createProto } from '@angular-proto/core';
+import { injectElementRef } from '@angular-proto/core/utils';
 import type { BooleanInput } from '@angular/cdk/coercion';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
@@ -11,8 +13,6 @@ import {
   PLATFORM_ID,
   signal,
 } from '@angular/core';
-import { createProto } from '@ng-proto/core';
-import { injectElementRef } from '@ng-proto/core/utils';
 
 export interface PressConfig {
   /**

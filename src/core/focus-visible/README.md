@@ -1,3 +1,3 @@
-# @ng-proto/core/focus-visible
+# @angular-proto/core/focus-visible
 
-Secondary entry point of `@ng-proto/core`. It can be used by importing from `@ng-proto/core/focus-visible`.
+Secondary entry point of `@angular-proto/core`. It can be used by importing from `@angular-proto/core/focus-visible`.

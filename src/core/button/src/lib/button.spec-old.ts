@@ -1,6 +1,6 @@
 // import { ChangeDetectionStrategy, Component, effect, signal, viewChild } from '@angular/core';
 // import { By } from '@angular/platform-browser';
-// import { InteractProto, ProtoInteract } from '@ng-proto/core/interact';
+// import { InteractProto, ProtoInteract } from '@angular-proto/core/interact';
 // import { fireEvent, render, screen } from '@testing-library/angular';
 // import { ProtoButton } from './button';
 

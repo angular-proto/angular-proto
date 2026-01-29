@@ -1,3 +1,4 @@
+import { createProto } from '@angular-proto/core';
 import type { BooleanInput } from '@angular/cdk/coercion';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
@@ -10,7 +11,6 @@ import {
   PLATFORM_ID,
   signal,
 } from '@angular/core';
-import { createProto } from '@ng-proto/core';
 
 /**
  * Time in milliseconds to ignore emulated mouse events after a touch interaction.

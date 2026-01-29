@@ -1,3 +1,5 @@
+import { createProto } from '@angular-proto/core';
+import { injectElementRef, uniqueId } from '@angular-proto/core/utils';
 import type { BooleanInput } from '@angular/cdk/coercion';
 import { DOCUMENT } from '@angular/common';
 import {
@@ -19,8 +21,6 @@ import {
   untracked,
   ViewContainerRef,
 } from '@angular/core';
-import { createProto } from '@ng-proto/core';
-import { injectElementRef, uniqueId } from '@ng-proto/core/utils';
 
 // ============================================================================
 // Types & Constants

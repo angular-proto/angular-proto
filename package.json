@@ -1,5 +1,5 @@
 {
-  "name": "@ng-proto/source",
+  "name": "@angular-proto/source",
   "version": "0.0.0",
   "license": "MIT",
   "packageManager": "pnpm@10.26.1",

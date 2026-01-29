@@ -1,3 +1,4 @@
+import { listener } from '@angular-proto/core/utils';
 import {
   afterNextRender,
   ChangeDetectionStrategy,
@@ -6,7 +7,6 @@ import {
   Injector,
   ViewEncapsulation,
 } from '@angular/core';
-import { listener } from '@ng-proto/core/utils';
 
 @Component({
   selector: 'docs-test',

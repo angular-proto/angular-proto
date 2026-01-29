@@ -1,3 +1,5 @@
+import { createProto } from '@angular-proto/core';
+import { injectElementRef } from '@angular-proto/core/utils';
 import type { FocusOrigin } from '@angular/cdk/a11y';
 import { FocusMonitor } from '@angular/cdk/a11y';
 import type { BooleanInput } from '@angular/cdk/coercion';
@@ -12,8 +14,6 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { createProto } from '@ng-proto/core';
-import { injectElementRef } from '@ng-proto/core/utils';
 
 export interface ProtoFocusConfig {
   /**

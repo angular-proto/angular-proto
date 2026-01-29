@@ -1,11 +1,11 @@
-import { computed, Directive, input } from '@angular/core';
-import { createProto } from '@ng-proto/core';
+import { createProto } from '@angular-proto/core';
 import {
   injectElementRef,
   isNativeAnchorTag,
   isNativeButtonTag,
   isNativeInputTag,
-} from '@ng-proto/core/utils';
+} from '@angular-proto/core/utils';
+import { computed, Directive, input } from '@angular/core';
 import { createProtoInteractDefaultConfig, InteractProto } from './interact';
 
 export interface ProtoInteractButtonConfig {

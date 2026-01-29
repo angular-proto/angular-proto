@@ -1,4 +1,4 @@
-# @ng-proto/core/anchor
+# @angular-proto/core/anchor
 
 CSS Anchor Positioning primitives for Angular. This module provides unstyled, accessible overlay positioning using native CSS anchor positioning APIs.
 
@@ -15,7 +15,7 @@ CSS Anchor Positioning primitives for Angular. This module provides unstyled, ac
 ## Installation
 
 ```typescript
-import { ProtoAnchor, ProtoAnchorTarget, ProtoAnchorArrow } from '@ng-proto/core/anchor';
+import { ProtoAnchor, ProtoAnchorTarget, ProtoAnchorArrow } from '@angular-proto/core/anchor';
 ```
 
 ## Basic Usage
@@ -228,7 +228,7 @@ Use data attributes for placement-aware styling:
 Configure defaults using `provideConfig`:
 
 ```typescript
-import { AnchorProto, AnchorTargetProto } from '@ng-proto/core/anchor';
+import { AnchorProto, AnchorTargetProto } from '@angular-proto/core/anchor';
 
 // In your component or route providers
 providers: [
@@ -306,7 +306,7 @@ class MyComponent {
 ## Utility Functions
 
 ```typescript
-import { getOppositePlacement, getPositionArea, parsePlacement } from '@ng-proto/core/anchor';
+import { getOppositePlacement, getPositionArea, parsePlacement } from '@angular-proto/core/anchor';
 
 // Get the opposite placement (for flip logic)
 getOppositePlacement('top'); // 'bottom'

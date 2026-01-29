@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ng-proto is an Angular library providing unstyled, accessible UI primitives built on composable atomic behaviors. It uses an Nx monorepo with pnpm.
+angular-proto is an Angular library providing unstyled, accessible UI primitives built on composable atomic behaviors. It uses an Nx monorepo with pnpm.
 
 **Stack:** Angular 21 (next), TypeScript 5.9, Nx 22, Vitest 4, Vite 7, ng-packagr, Playwright (e2e)
 
@@ -33,8 +33,8 @@ nx test core -- --testPathPattern=hover
 ### Two-tier library structure
 
 ```
-primitives (@ng-proto/primitives)    ← depends on core
-  └── core (@ng-proto/core)          ← no external lib dependencies
+primitives (@angular-proto/primitives)    ← depends on core
+  └── core (@angular-proto/core)          ← no external lib dependencies
 ```
 
 Enforced via `@nx/enforce-module-boundaries` ESLint rule with tags: `core` has no deps, `primitives` depends on `core`, `app` depends on both.
@@ -72,7 +72,7 @@ Each core directive (focus, hover, press, button, disable) follows this pattern:
 
 ### Path Aliases
 
-Imports use `@ng-proto/core`, `@ng-proto/core/focus`, `@ng-proto/core/utils`, `@ng-proto/primitives`, etc. (defined in `tsconfig.base.json`).
+Imports use `@angular-proto/core`, `@angular-proto/core/focus`, `@angular-proto/core/utils`, `@angular-proto/primitives`, etc. (defined in `tsconfig.base.json`).
 
 ## Testing
 
