@@ -4,14 +4,19 @@
   "license": "MIT",
   "packageManager": "pnpm@10.26.1",
   "scripts": {
-    "prepare": "husky",
-    "format": "prettier --write .",
+    "build": "nx run-many -t build --no-tui",
     "fix": "pnpm format && nx run-many -t lint --fix --no-tui",
-    "pre:commit": "pnpm format && nx run-many -t lint --fix --no-tui",
-    "pre:push": "pnpm format && nx run-many -t lint test --fix --no-tui",
+    "format": "prettier --write .",
+    "lint:core": "nx lint core --no-tui",
+    "lint:docs": "nx lint docs --no-tui",
+    "lint:primitives": "nx lint primitives --no-tui",
+    "lint": "nx run-many -t lint --no-tui",
+    "prepare": "husky",
     "start": "nx serve docs",
-    "test": "nx run-many -t test --watch --no-tui",
-    "build": "nx run-many -t build"
+    "test:core": "nx test core --no-tui",
+    "test:docs": "nx test docs --no-tui",
+    "test:primitives": "nx test primitives --no-tui",
+    "test": "nx run-many -t test --no-tui"
   },
   "lint-staged": {
     "*.{ts,js,tsx,jsx,mjs,cjs,html,json,md,css,scss}": [
@@ -31,9 +36,12 @@
     "@angular/platform-server": "21.2.0-next.1",
     "@angular/router": "21.2.0-next.1",
     "@angular/ssr": "21.2.0-next.0",
-    "@ngrx/signals": "21.0.0-rc.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "express": "^5.2.1",
-    "rxjs": "~7.8.2"
+    "rxjs": "~7.8.2",
+    "tailwind-merge": "^3.4.0",
+    "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "~2.1.3",
@@ -60,6 +68,7 @@
     "@swc-node/register": "~1.9.2",
     "@swc/core": "~1.5.29",
     "@swc/helpers": "~0.5.18",
+    "@tailwindcss/vite": "^4.1.18",
     "@testing-library/angular": "^19.0.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/user-event": "^14.6.1",
@@ -84,6 +93,7 @@
     "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "tailwindcss": "^4.1.18",
     "tslib": "^2.8.1",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.54.0",

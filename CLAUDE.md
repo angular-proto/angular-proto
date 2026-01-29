@@ -11,21 +11,21 @@ angular-proto is an Angular library providing unstyled, accessible UI primitives
 ## Commands
 
 ```bash
-pnpm install                          # Install dependencies
-pnpm test                             # Run all tests (nx run-many -t test)
-pnpm lint                             # Lint all projects
 pnpm build                            # Build all projects
 pnpm fix                              # Format + fix lint errors
+pnpm format                           # Format code
+pnpm install                          # Install dependencies
+pnpm lint                             # Lint all projects
+pnpm lint:core                        # Lint core library only
+pnpm lint:docs                        # Lint docs project
+pnpm lint:primitives                  # Lint primitives library only
 pnpm start                            # Serve docs app
+pnpm test                             # Test all projects
+pnpm test:core                        # Test core library only
+pnpm test:primitives                  # Test primitives library only
 
-# Single project targets
-nx test core                          # Test core library only
-nx test primitives                    # Test primitives library only
-nx lint core                          # Lint core library only
-nx build core                         # Build core library only
-
-# Single test file (via vitest)
-nx test core -- --testPathPattern=hover
+# Single test file, note you need to make sure the config file is correct for the project file you are testing.
+pnpm exec vitest run --config ./src/core/vite.config.mts  ./src/core/anchor/src/lib/anchor.spec.ts
 ```
 
 ## Architecture
