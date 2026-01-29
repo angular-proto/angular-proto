@@ -39,6 +39,8 @@ export default [
     files: ['**/*.ts', '**/*.tsx'],
     // Override or add rules here
     rules: {
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/array-type': ['warn'],
       '@typescript-eslint/consistent-type-imports': 'off',
       '@typescript-eslint/consistent-indexed-object-style': 'off',

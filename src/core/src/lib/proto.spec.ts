@@ -227,28 +227,28 @@ describe('createProto', () => {
       const { p1, p2, p3, c1, c2 } = fixture.componentInstance;
 
       // p1 has no ancestors
-      expect(p1().state.ancestry.all()).toEqual([]);
+      expect(p1().state.ancestry.allAncestors()).toEqual([]);
 
       // p2's ancestors are [p1]
-      const p2All = p2().state.ancestry.all();
+      const p2All = p2().state.ancestry.allAncestors();
       expect(p2All.length).toBe(1);
       expect(p2All[0].state).toBe(p1().state);
 
       // c1's ancestors are [p2, p1] (nearest first)
-      const c1All = c1().state.ancestry.all();
+      const c1All = c1().state.ancestry.allAncestors();
       expect(c1All.length).toBe(2);
       expect(c1All[0].state).toBe(p2().state);
       expect(c1All[1].state).toBe(p1().state);
 
       // p3's ancestors are [c1, p2, p1]
-      const p3All = p3().state.ancestry.all();
+      const p3All = p3().state.ancestry.allAncestors();
       expect(p3All.length).toBe(3);
       expect(p3All[0].state).toBe(c1().state);
       expect(p3All[1].state).toBe(p2().state);
       expect(p3All[2].state).toBe(p1().state);
 
       // c2's ancestors are [p3, c1, p2, p1]
-      const c2All = c2().state.ancestry.all();
+      const c2All = c2().state.ancestry.allAncestors();
       expect(c2All.length).toBe(4);
       expect(c2All[0].state).toBe(p3().state);
       expect(c2All[1].state).toBe(c1().state);
@@ -346,10 +346,14 @@ describe('createProto', () => {
       const { c2 } = fixture.componentInstance;
 
       // Filter by name using predicate
-      const parentAncestors = c2().state.ancestry.all(e => e.state.protoName === 'ParentDir');
+      const parentAncestors = c2().state.ancestry.allAncestors(
+        e => e.state.protoName === 'ParentDir',
+      );
       expect(parentAncestors.length).toBe(3);
 
-      const childAncestors = c2().state.ancestry.all(e => e.state.protoName === 'ChildDir');
+      const childAncestors = c2().state.ancestry.allAncestors(
+        e => e.state.protoName === 'ChildDir',
+      );
       expect(childAncestors.length).toBe(1);
     });
 
@@ -361,6 +365,193 @@ describe('createProto', () => {
       const filtered = p3().state.ancestry.ancestors(e => e.state().value() === 'p1');
       expect(filtered.length).toBe(1);
       expect(filtered[0].state).toBe(p1().state);
+    });
+  });
+
+  describe('children', () => {
+    const ParentProto = createProto<ParentDir>('ParentDir');
+
+    @Directive({
+      selector: '[parent]',
+      exportAs: 'parent',
+      providers: [ParentProto.provideState()],
+    })
+    class ParentDir {
+      readonly value = input<string>('parent');
+      readonly state = ParentProto.initState(this);
+    }
+
+    const ChildProto = createProto<ChildDir>('ChildDir');
+
+    @Directive({
+      selector: '[child]',
+      exportAs: 'child',
+      providers: [ChildProto.provideState()],
+    })
+    class ChildDir {
+      readonly value = input<string>('child');
+      readonly state = ChildProto.initState(this);
+    }
+
+    @Component({
+      selector: 'test-children',
+      changeDetection: ChangeDetectionStrategy.OnPush,
+      imports: [ParentDir, ChildDir],
+      template: `
+        <div #p1="parent" parent value="p1">
+          <div #p2="parent" parent value="p2">
+            <div #c1="child" child value="c1"></div>
+            <div #p3="parent" parent value="p3"></div>
+          </div>
+          @if (showChildren()) {
+            <div #c2="child" child value="c2">
+              <div #p4="parent" parent value="p4"></div>
+            </div>
+          }
+        </div>
+      `,
+    })
+    class TestChildrenComp {
+      readonly p1 = viewChild.required('p1', { read: ParentDir });
+      readonly p2 = viewChild.required('p2', { read: ParentDir });
+      readonly p3 = viewChild.required('p3', { read: ParentDir });
+      readonly p4 = viewChild.required('p4', { read: ParentDir });
+      readonly c1 = viewChild.required('c1', { read: ChildDir });
+      readonly c2 = viewChild.required('c2', { read: ChildDir });
+      readonly showChildren = signal(true);
+    }
+
+    it('ancestry.children should return all descendants of same proto type', async () => {
+      const { fixture } = await render(TestChildrenComp);
+      const { p1, p2, p3, p4, c1, c2 } = fixture.componentInstance;
+
+      // p1's children of same type (ParentDir) are all ParentDir descendants: [p2, p3, p4]
+      let p1Children = p1().state.ancestry.children();
+      expect(p1Children.length).toBe(3);
+      expect(p1Children[0].state).toBe(p2().state);
+      expect(p1Children[1].state).toBe(p3().state);
+      expect(p1Children[2].state).toBe(p4().state);
+
+      // p2's children of same type are [p3] (p4 is not a descendant of p2)
+      const p2Children = p2().state.ancestry.children();
+      expect(p2Children.length).toBe(1);
+      expect(p2Children[0].state).toBe(p3().state);
+
+      // p3 has no children of same type
+      expect(p3().state.ancestry.children()).toEqual([]);
+
+      // p4 has no children of same type
+      expect(p4().state.ancestry.children()).toEqual([]);
+
+      // c1 has no children of same type
+      expect(c1().state.ancestry.children()).toEqual([]);
+
+      // c2 has no children of same type (p4 is different type)
+      expect(c2().state.ancestry.children()).toEqual([]);
+
+      // Toggle children to verify reactive behavior
+      fixture.componentInstance.showChildren.set(false);
+      fixture.detectChanges();
+
+      // p1's children of same type (ParentDir) are [p2, p3, p4]
+      p1Children = p1().state.ancestry.children();
+      expect(p1Children.length).toBe(2);
+      expect(p1Children[0].state).toBe(p2().state);
+      expect(p1Children[1].state).toBe(p3().state);
+
+      const p1All = p1().state.ancestry.allChildren()();
+      expect(p1All.length).toBe(3);
+      expect(p1All[0].state).toBe(p2().state);
+      expect(p1All[1].state).toBe(c1().state);
+      expect(p1All[2].state).toBe(p3().state);
+    });
+
+    it('ancestry.childrenOfType(token) should return all descendants of given proto type', async () => {
+      const { fixture } = await render(TestChildrenComp);
+      const { p1, p2, p3, c1, c2 } = fixture.componentInstance;
+
+      // p1's ChildDir descendants are [c1, c2] (all ChildDir descendants)
+      const p1ChildChildren = p1().state.ancestry.childrenOfType(ChildProto.token)();
+      expect(p1ChildChildren.length).toBe(2);
+      expect(p1ChildChildren[0].state).toBe(c1().state);
+      expect(p1ChildChildren[1].state).toBe(c2().state);
+
+      // p2's ChildDir descendants are [c1] only (c2 is not under p2)
+      const p2ChildChildren = p2().state.ancestry.childrenOfType(ChildProto.token)();
+      expect(p2ChildChildren.length).toBe(1);
+      expect(p2ChildChildren[0].state).toBe(c1().state);
+
+      // p3 has no ChildDir descendants
+      const p3ChildChildren = p3().state.ancestry.childrenOfType(ChildProto.token)();
+      expect(p3ChildChildren.length).toBe(0);
+
+      // c2's ParentDir descendants are [p4]
+      const c2ParentChildren = c2().state.ancestry.childrenOfType(ParentProto.token)();
+      expect(c2ParentChildren.length).toBe(1);
+      expect(c2ParentChildren[0].state).toBe(fixture.componentInstance.p4().state);
+    });
+
+    it('ancestry.allChildren() should return all descendants regardless of type', async () => {
+      const { fixture } = await render(TestChildrenComp);
+      const { p1, p2, p3, p4, c1, c2 } = fixture.componentInstance;
+
+      // p1's all descendants are [p2, c1, p3, c2, p4] (5 total)
+      const p1AllChildren = p1().state.ancestry.allChildren()();
+      expect(p1AllChildren.length).toBe(5);
+      expect(p1AllChildren[0].state).toBe(p2().state);
+      expect(p1AllChildren[1].state).toBe(c1().state);
+      expect(p1AllChildren[2].state).toBe(p3().state);
+      expect(p1AllChildren[3].state).toBe(c2().state);
+      expect(p1AllChildren[4].state).toBe(p4().state);
+
+      // p2's all descendants are [c1, p3]
+      const p2AllChildren = p2().state.ancestry.allChildren()();
+      expect(p2AllChildren.length).toBe(2);
+      expect(p2AllChildren[0].state).toBe(c1().state);
+      expect(p2AllChildren[1].state).toBe(p3().state);
+
+      // p3 has no descendants
+      expect(p3().state.ancestry.allChildren()()).toEqual([]);
+
+      // c1 has no descendants
+      expect(c1().state.ancestry.allChildren()()).toEqual([]);
+
+      // c2's all descendants are [p4]
+      const c2AllChildren = c2().state.ancestry.allChildren()();
+      expect(c2AllChildren.length).toBe(1);
+      expect(c2AllChildren[0].state).toBe(p4().state);
+    });
+
+    it('childrenOfType should return cached signal for same token', async () => {
+      const { fixture } = await render(TestChildrenComp);
+      const { p1, c1, c2 } = fixture.componentInstance;
+
+      // Get childrenOfType signal twice with same token
+      const signal1 = p1().state.ancestry.childrenOfType(ChildProto.token);
+      const signal2 = p1().state.ancestry.childrenOfType(ChildProto.token);
+
+      // Should return the exact same signal instance (cached)
+      expect(signal1).toBe(signal2);
+
+      // The signal should still work correctly
+      const children = signal1();
+      expect(children.length).toBe(2);
+      expect(children[0].state).toBe(c1().state);
+      expect(children[1].state).toBe(c2().state);
+    });
+
+    it('ancestry.children should be reactive (signal)', async () => {
+      // Create a simple test to verify children is a reactive signal
+      const { fixture } = await render(TestChildrenComp);
+      const { p1 } = fixture.componentInstance;
+
+      // Verify children is a signal (can be called as a function)
+      const childrenSignal = p1().state.ancestry.children;
+      expect(typeof childrenSignal).toBe('function');
+
+      // Get the current value
+      const children = childrenSignal();
+      expect(Array.isArray(children)).toBe(true);
     });
   });
 

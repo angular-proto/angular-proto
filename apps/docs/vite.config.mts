@@ -24,5 +24,10 @@ export default defineConfig(() => ({
       reportsDirectory: '../../coverage/apps/docs',
       provider: 'v8' as const,
     },
+    typecheck: {
+      enabled: true,
+      tsconfig: './tsconfig.app.json',
+      include: ['{src,tests}/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    },
   },
 }));

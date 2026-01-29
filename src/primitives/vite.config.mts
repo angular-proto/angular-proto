@@ -24,5 +24,10 @@ export default defineConfig(() => ({
       reportsDirectory: '../../coverage/src/primitives',
       provider: 'v8' as const,
     },
+    typecheck: {
+      enabled: true,
+      tsconfig: './tsconfig.lib.json',
+      include: ['./**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    },
   },
 }));

@@ -1,4 +1,5 @@
 import {
+  DestroyRef,
   ElementRef,
   inject,
   InjectionToken,
@@ -50,12 +51,13 @@ export type ProtoDirective<T extends object> = {
 };
 
 const PROTO_STATE_SIGNAL: unique symbol = Symbol('PROTO_STATE_SIGNAL');
+const ALL_CHILDREN: unique symbol = Symbol('ALL_CHILDREN');
 
 export function isProtoStateSignal(value: unknown): value is ProtoStateProps<object, object> {
   return isObject(value) && value[PROTO_STATE_SIGNAL] === true;
 }
 
-export interface ProtoStateProps<T extends object, C extends object> {
+export interface ProtoStateProps<T extends object = object, C extends object = object> {
   readonly [PROTO_STATE_SIGNAL]: true;
   readonly protoId: string;
   readonly protoName: string;
@@ -126,6 +128,8 @@ export function createProto<T extends object, C extends object = object>(
           const source = signal<ProtoDirective<T> | null>(null);
           const chain = inject(PROTO_ANCESTRY_CHAIN, { optional: true, skipSelf: true }) ?? [];
 
+          const children = signal<ProtoAncestorEntry[]>([]);
+
           const props: ProtoStateProps<T, C> = {
             [PROTO_STATE_SIGNAL]: true,
             protoId: uniqueId(name),
@@ -133,11 +137,31 @@ export function createProto<T extends object, C extends object = object>(
             config: injectConfig(),
             injector: inject(Injector),
             elementRef: injectElementRef<HTMLElement>(),
-            ancestry: createProtoAncestry(chain, publicToken),
+            ancestry: createProtoAncestry(chain, publicToken, children.asReadonly()),
           };
 
+          (props as unknown as Record<symbol, unknown>)[ALL_CHILDREN] = children;
+
           // Combine signal with metadata - Object.assign preserves the signal function
-          return Object.assign(source, props);
+          const protoState = Object.assign(source, props);
+
+          // Register this proto as a child of all ancestors
+          const destroyRef = inject(DestroyRef);
+          const selfEntry: ProtoAncestorEntry<T, C> = {
+            token: publicToken,
+            state: protoState as unknown as ProtoState<T, C>,
+          };
+          for (const ancestor of chain) {
+            const cSignal = (ancestor.state as unknown as Record<symbol, unknown>)[
+              ALL_CHILDREN
+            ] as WritableSignal<ProtoAncestorEntry[]>;
+            cSignal.update(c => [...c, selfEntry]);
+            destroyRef.onDestroy(() => {
+              cSignal.update(c => c.filter(p => p !== selfEntry));
+            });
+          }
+
+          return protoState;
         },
       },
       {
