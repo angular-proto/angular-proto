@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "husky",
     "format": "prettier --write .",
-    "fix": "pnpm format && nx run-many -t lint --fix",
+    "fix": "pnpm format && nx run-many -t lint --fix --no-tui",
     "pre:commit": "pnpm format && nx run-many -t lint --fix --no-tui",
     "pre:push": "pnpm format && nx run-many -t lint test --fix --no-tui",
     "start": "nx serve documentation",
