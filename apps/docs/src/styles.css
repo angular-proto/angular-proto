@@ -1,1 +1,201 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --surface-dark: light-dark(oklch(0.92 0 266), oklch(0.05 0.005 266));
+  --surface: light-dark(oklch(0.96 0 266), oklch(0.15 0.005 266));
+  --surface-hover: light-dark(oklch(0.9 0 266 / 80%), oklch(0.4 0.02 266 / 50%));
+  --surface-light: light-dark(oklch(1 0 266), oklch(0.25 0 266));
+  --surface-light-hover: light-dark(oklch(0.96 0.005 266 / 80%), oklch(0.5 0.02 266 / 50%));
+
+  --on-surface: light-dark(oklch(0.15 0.01 266), oklch(0.96 0.01 266));
+  --on-surface-muted: light-dark(oklch(0.4 0.01 266), oklch(0.7 0.01 266));
+
+  --border: light-dark(oklch(0.8 0.01 266), oklch(0.3 0.01 266));
+  --ring: light-dark(oklch(0.7 0.02 266), oklch(0.6 0.02 266));
+
+  --primary: light-dark(oklch(0.5 0.15 266), oklch(0.8 0.15 266));
+  --on-primary: light-dark(oklch(1 0 266), oklch(0.3 0.15 266));
+  --primary-hover: light-dark(oklch(0.55 0.15 266), oklch(0.65 0.15 266));
+
+  --danger: light-dark(oklch(0.5 0.15 30), oklch(0.8 0.15 30));
+  --on-danger: light-dark(oklch(1 0 30), oklch(0.2 0.1 30));
+
+  --warning: light-dark(oklch(0.65 0.2 80), oklch(0.8 0.2 80));
+  --warning-hover: light-dark(oklch(0.575 0.2 80), oklch(0.7 0.2 80));
+  --on-warning: light-dark(oklch(1 0 80), oklch(0.2 0.1 80));
+
+  --success: light-dark(oklch(0.5 0.2 160), oklch(0.8 0.2 160));
+  --success-accent: light-dark(oklch(0.6 0.2 160), oklch(0.9 0.2 160));
+  --on-success: light-dark(oklch(1 0 160), oklch(0.2 0.1 160));
+}
+
+@theme inline {
+  --font-sans:
+    'Open Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-serif: 'Source Serif 4', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-mono:
+    'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+
+  --color-surface-dark: var(--surface-dark);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-light: var(--surface-light);
+  --color-surface-light-hover: var(--surface-light-hover);
+
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-muted: var(--on-surface-muted);
+
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-hover: var(--primary-hover);
+
+  --color-danger: var(--danger);
+  --color-on-danger: var(--on-danger);
+
+  --color-warning: var(--warning);
+  --color-warning-accent: var(--warning-accent);
+  --color-on-warning: var(--on-warning);
+
+  --color-success: var(--success);
+  --color-success-accent: var(--success-accent);
+  --color-on-success: var(--on-success);
+}
+
+:root {
+  color-scheme: dark light;
+}
+.dark {
+  color-scheme: dark;
+}
+.light {
+  color-scheme: light;
+}
+body {
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[role='button']:not(:disabled),
+[role='menuitem']:not(:disabled),
+[data-slot='button']:not(:disabled),
+button:not(:disabled) {
+  @apply cursor-pointer;
+}
+
+input[type='radio'] {
+  accent-color: var(--color-primary);
+}
+
+input[type='radio']:focus,
+input[type='radio']:focus-visible {
+  @apply border-none ring-0 outline-none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-on-surface-muted);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background: var(--color-surface-light);
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield; /* Added for general compatibility */
+}
+
+ng-component,
+router-outlet {
+  @apply contents;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50 shadow-black/20 focus-visible:z-1 dark:shadow-black/80;
+  }
+  :root {
+    @apply flex h-dvh w-dvw flex-col;
+  }
+  body {
+    @apply bg-surface-dark text-on-surface flex flex-1 flex-col font-sans text-sm;
+  }
+  code {
+    @apply font-mono;
+  }
+  p {
+    @apply text-on-surface-muted text-pretty;
+  }
+  pre {
+    @apply font-mono text-sm whitespace-pre;
+  }
+  .ag-cell-wrapper {
+    @apply h-[inherit];
+  }
+}
+
+@utility shadow-s {
+  box-shadow:
+    inset 0 1px 2px light-dark(oklch(1 0.01 266 / 15%), oklch(1 0.01 266 / 15%)),
+    0 1px 2px light-dark(oklch(0 0.01 266 / 10%), oklch(0 0.01 266 / 60%)),
+    0 2px 4px light-dark(oklch(0 0.01 266 / 10%), oklch(0 0.01 266 / 60%));
+}
+@utility shadow-m {
+  box-shadow:
+    inset 0 1px 3px light-dark(oklch(1 0.01 266 / 15%), oklch(1 0.01 266 / 15%)),
+    0 2px 4px light-dark(oklch(0 0.01 266 / 10%), oklch(0 0.01 266 / 60%)),
+    0 4px 8px light-dark(oklch(0 0.01 266 / 10%), oklch(0 0.01 266 / 60%));
+}
+@utility shadow-l {
+  box-shadow:
+    inset 0 1px 4px light-dark(oklch(1 0.01 266 / 15%), oklch(1 0.01 266 / 15%)),
+    0 4px 8px light-dark(oklch(0 0.01 266 / 10%), oklch(0 0.01 266 / 60%)),
+    0 8px 16px light-dark(oklch(0 0.01 266 / 10%), oklch(0 0.01 266 / 60%));
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility loader-container {
+  @apply grid w-full flex-1 place-content-center p-4;
+}
+
+@utility h-fill-available {
+  height: -webkit-fill-available;
+  height: -moz-available;
+  height: fill-available;
+}
+
+@utility w-fill-available {
+  width: -webkit-fill-available;
+  width: -moz-available;
+  width: fill-available;
+}

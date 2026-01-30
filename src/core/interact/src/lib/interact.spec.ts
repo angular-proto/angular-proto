@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { fireEvent, render, screen } from '@testing-library/angular';
-import { InteractProto, ProtoInteract } from './interact';
+import { ProtoInteract } from './interact';
 
 describe('ProtoDisable', () => {
   describe('disabled state', () => {
@@ -363,7 +363,7 @@ describe('ProtoDisable', () => {
       changeDetection: ChangeDetectionStrategy.OnPush,
       imports: [TestElement],
       providers: [
-        InteractProto.provideHooks(state => {
+        ProtoInteract.Hooks.provide(state => {
           effect(() => {
             const value = state();
             const parent = state.ancestry.parent?.state();
@@ -505,7 +505,7 @@ describe('ProtoDisable', () => {
       });
 
       const { fallbackTabIndex } = runInInjectionContext(fixture.componentRef.injector, () =>
-        InteractProto.injectConfig(),
+        ProtoInteract.Config.inject(),
       );
       expect(fallbackTabIndex).toBe(0);
 
@@ -519,7 +519,7 @@ describe('ProtoDisable', () => {
       });
 
       const { fallbackTabIndex } = runInInjectionContext(fixture.componentRef.injector, () =>
-        InteractProto.injectConfig(),
+        ProtoInteract.Config.inject(),
       );
       expect(fallbackTabIndex).toBe(0);
 
@@ -530,14 +530,14 @@ describe('ProtoDisable', () => {
     it('should use the fallback tab index when the element has no tabindex attribute and the fallback tab index is set', async () => {
       const { fixture } = await render(`<div protoInteract>Custom</div>`, {
         imports: [ProtoInteract],
-        providers: [InteractProto.provideConfig({ fallbackTabIndex: 2 })],
+        providers: [ProtoInteract.Config.provide({ fallbackTabIndex: 2 })],
       });
 
-      const { fallbackTabIndex } = fixture.componentRef.injector.get(InteractProto.configToken);
+      const { fallbackTabIndex } = fixture.componentRef.injector.get(ProtoInteract.Config.token);
       expect(fallbackTabIndex).toBe(2);
 
       expect(
-        runInInjectionContext(fixture.componentRef.injector, () => InteractProto.injectConfig())
+        runInInjectionContext(fixture.componentRef.injector, () => ProtoInteract.Config.inject())
           .fallbackTabIndex,
       ).toBe(2);
 
@@ -548,13 +548,13 @@ describe('ProtoDisable', () => {
     it('should not use the fallback tab index when the element has a tabindex attribute and the fallback tab index is set', async () => {
       const { fixture } = await render(`<div protoInteract tabindex="1">Custom</div>`, {
         imports: [ProtoInteract],
-        providers: [InteractProto.provideConfig({ fallbackTabIndex: -1 })],
+        providers: [ProtoInteract.Config.provide({ fallbackTabIndex: -1 })],
       });
-      const { fallbackTabIndex } = fixture.componentRef.injector.get(InteractProto.configToken);
+      const { fallbackTabIndex } = fixture.componentRef.injector.get(ProtoInteract.Config.token);
       expect(fallbackTabIndex).toBe(-1);
 
       expect(
-        runInInjectionContext(fixture.componentRef.injector, () => InteractProto.injectConfig())
+        runInInjectionContext(fixture.componentRef.injector, () => ProtoInteract.Config.inject())
           .fallbackTabIndex,
       ).toBe(-1);
 

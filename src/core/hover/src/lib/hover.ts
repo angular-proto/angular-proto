@@ -69,7 +69,9 @@ export interface ProtoHoverConfig {
   disabled: boolean;
 }
 
-export const HoverProto = createProto<ProtoHover, ProtoHoverConfig>('Hover', { disabled: false });
+const protoFor = createProto<ProtoHover, ProtoHoverConfig>({
+  disabled: false,
+});
 
 /**
  * Directive that tracks hover state with proper touch device handling.
@@ -109,10 +111,15 @@ export const HoverProto = createProto<ProtoHover, ProtoHoverConfig>('Hover', { d
     '(mouseenter)': 'onMouseEnter($event)',
     '(mouseleave)': 'onMouseLeave($event)',
   },
-  providers: [HoverProto.provideState()],
+  providers: [ProtoHover.State.provide()],
 })
 export class ProtoHover {
-  readonly config = HoverProto.injectConfig();
+  private static readonly Proto = protoFor(ProtoHover);
+  static readonly State = ProtoHover.Proto.state;
+  static readonly Config = ProtoHover.Proto.config;
+  static readonly Hooks = ProtoHover.Proto.hooks;
+
+  readonly config = ProtoHover.Config.inject();
   private readonly platformId = inject(PLATFORM_ID);
   private readonly document = inject(DOCUMENT);
 
@@ -148,7 +155,7 @@ export class ProtoHover {
    */
   private ignoreEmulatedMouseEvents = false;
 
-  readonly state = HoverProto.initState(this);
+  readonly state = ProtoHover.Proto(this);
 
   constructor() {
     // Setup global touch listeners for emulated mouse event detection

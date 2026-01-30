@@ -24,10 +24,9 @@ export interface ProtoFocusVisibleConfig {
   defaultDisabled: boolean;
 }
 
-export const FocusVisibleProto = createProto<ProtoFocusVisible, ProtoFocusVisibleConfig>(
-  'FocusVisible',
-  { defaultDisabled: false },
-);
+const protoFor = createProto<ProtoFocusVisible, ProtoFocusVisibleConfig>({
+  defaultDisabled: false,
+});
 
 /**
  * Determines if focus should be considered "visible" based on the focus origin.
@@ -117,10 +116,15 @@ function isFocusableTextInput(element: HTMLElement): boolean {
   host: {
     '[attr.data-focus-visible]': "isFocusVisible() ? '' : null",
   },
-  providers: [FocusVisibleProto.provideState()],
+  providers: [ProtoFocusVisible.State.provide()],
 })
 export class ProtoFocusVisible {
-  private readonly config = FocusVisibleProto.injectConfig();
+  private static readonly Proto = protoFor(ProtoFocusVisible);
+  static readonly State = ProtoFocusVisible.Proto.state;
+  static readonly Config = ProtoFocusVisible.Proto.config;
+  static readonly Hooks = ProtoFocusVisible.Proto.hooks;
+
+  readonly config = ProtoFocusVisible.Config.inject();
   private readonly elementRef = injectElementRef();
   private readonly focusMonitor = inject(FocusMonitor);
   private readonly injector = inject(Injector);
@@ -155,10 +159,7 @@ export class ProtoFocusVisible {
    */
   readonly isFocusVisible = this._isFocusVisible.asReadonly();
 
-  /**
-   * The state of the focus-visible directive.
-   */
-  readonly state = FocusVisibleProto.initState(this);
+  readonly state = ProtoFocusVisible.Proto(this);
 
   constructor() {
     afterRenderEffect(

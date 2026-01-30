@@ -2,7 +2,7 @@
 import angular from '@analogjs/vite-plugin-angular';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -17,7 +17,7 @@ export default defineConfig(() => ({
     watch: false,
     globals: true,
     environment: 'jsdom',
-    include: ['./**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     setupFiles: ['test-setup.ts'],
     reporters: ['default'],
     coverage: {
@@ -27,7 +27,7 @@ export default defineConfig(() => ({
     typecheck: {
       enabled: true,
       tsconfig: './tsconfig.lib.json',
-      include: ['./**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+      include: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     },
   },
 }));

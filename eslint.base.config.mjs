@@ -27,8 +27,12 @@ export default [
               onlyDependOnLibsWithTags: ['core'],
             },
             {
-              sourceTag: 'docs',
+              sourceTag: 'ui',
               onlyDependOnLibsWithTags: ['core', 'primitives'],
+            },
+            {
+              sourceTag: 'docs',
+              onlyDependOnLibsWithTags: ['core', 'primitives', 'ui'],
             },
           ],
         },
@@ -37,7 +41,6 @@ export default [
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
-    // Override or add rules here
     rules: {
       '@typescript-eslint/no-unsafe-function-type': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',

@@ -25,7 +25,7 @@ pnpm test:core                        # Test core library only
 pnpm test:primitives                  # Test primitives library only
 
 # Single test file, note you need to make sure the config file is correct for the project file you are testing.
-pnpm exec vitest run --config ./src/core/vite.config.mts  ./src/core/anchor/src/lib/anchor.spec.ts
+pnpm exec vitest run --config ./src/core/vite.config.mts  ./src/core/hover/src/lib/hover.spec.ts
 ```
 
 ## Architecture
@@ -41,15 +41,41 @@ Enforced via `@nx/enforce-module-boundaries` ESLint rule with tags: `core` has n
 
 ### The Proto System (`src/core/src/lib/proto.ts`)
 
-The central abstraction is `createProto<T, N, C>()` which creates a protocol for any directive/component. It returns a `Proto` object providing:
+The central abstraction uses a factory pattern to create protocols for directives/components:
 
-- **`provideState()`** — Angular provider that creates `ProtoState` (signal + metadata) and registers the directive in the ancestry chain
-- **`initState(instance)`** — Called once in a directive's constructor; wraps all `InputSignal` properties into `ControlledInput` signals, sets the state, and runs hooks
-- **`injectState()`** — Retrieves the proto state from DI
-- **`provideConfig()` / `injectConfig()`** — Hierarchical configuration that merges parent config with overrides
-- **`hooks()`** — Provider for lifecycle hooks that run after init
+```typescript
+// 1. Create a factory with optional config
+const protoFor = createProto<ProtoHover, ProtoHoverConfig>({ disabled: false });
 
-`ProtoState<T, N, C>` is a `Signal<ProtoDirective<T>>` combined with `ProtoMetadata` (protoId, protoName, protoType, config, ancestry, injector, elementRef).
+// 2. Define the directive with static Proto members
+@Directive({
+  selector: '[protoHover]',
+  providers: [ProtoHover.State.provide()],
+})
+export class ProtoHover {
+  private static readonly Proto = protoFor(ProtoHover);
+  static readonly State = ProtoHover.Proto.state;
+  static readonly Config = ProtoHover.Proto.config; // Only if config exists
+  static readonly Hooks = ProtoHover.Proto.hooks;
+
+  readonly config = ProtoHover.Config.inject();
+  readonly state = ProtoHover.Proto(this);
+}
+```
+
+**Static API on each directive class:**
+
+- **`MyDirective.State.provide()`** — Angular provider that creates `ProtoState` and registers in ancestry chain
+- **`MyDirective.State.inject()`** — Retrieves the proto state from DI
+- **`MyDirective.Config.provide(cfg)`** — Provides hierarchical configuration (only if proto has config)
+- **`MyDirective.Config.inject()`** — Injects merged configuration
+- **`MyDirective.Hooks.provide(...hooks)`** — Provides lifecycle hooks
+
+**Instance initialization:**
+
+- **`MyDirective.Proto(this)`** — Called in constructor; wraps all `InputSignal` properties into `ControlledInput` signals, sets state, runs hooks
+
+`ProtoState<MyDirective, MyConfig>` is a `Signal<ProtoDirective<MyDirective>>` combined with `ProtoMetadata` (protoId, protoName, config, ancestry, injector, elementRef).
 
 ### Ancestry (`src/core/src/lib/proto-ancestry.ts`)
 
@@ -61,14 +87,16 @@ Protos track their hierarchy via `PROTO_ANCESTRY_CHAIN` injection token. Each pr
 
 ### Directive Pattern
 
-Each core directive (focus, hover, press, button, disable) follows this pattern:
+Each core directive (ProtoFocus, ProtoHover, ProtoPress, ProtoInteractButton, ProtoInteract) follows this pattern:
 
-1. Define a proto via `createProto({ name, type, config })`
-2. Inject config and dependencies
-3. Declare inputs/outputs as signals
-4. Call `Proto.initState(this)` in the constructor
-5. Use `afterRenderEffect` for DOM lifecycle with cleanup
-6. Set data attributes (`data-hover`, `data-focus`) for styling hooks
+1. Create factory: `const protoFor = createProto<MyDirective, MyConfig>(defaultConfig)`
+2. Add static members in class: `Proto`, `State`, `Config` (if has config), `Hooks`
+3. In providers: `MyDirective.State.provide()`
+4. Inject config: `MyDirective.Config.inject()`
+5. Declare inputs/outputs as signals
+6. Initialize state: `MyDirective.Proto(this)`
+7. Use `afterRenderEffect` for DOM lifecycle with cleanup
+8. Set data attributes (`data-hover`, `data-focus`) for styling hooks
 
 ### Path Aliases
 

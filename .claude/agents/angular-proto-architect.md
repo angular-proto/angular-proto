@@ -25,29 +25,34 @@ angular-proto is an Angular library providing unstyled, accessible UI primitives
 This is the heart of angular-proto. Every directive follows this pattern:
 
 ```typescript
-// 1. Create the proto with config
-export const HoverProto = createProto<ProtoHover, ProtoHoverConfig>('Hover', defaultConfig);
+// 1. Create a factory with optional config
+const protoFor = createProto<ProtoHover, ProtoHoverConfig>({ disabled: false });
 
-// 2. Define the directive
+// 2. Define the directive with static Proto members
 @Directive({
   selector: '[protoHover]',
   exportAs: 'protoHover',
   host: {
     '[attr.data-hover]': "isHovered() ? '' : null",
   },
-  providers: [HoverProto.provideState()],
+  providers: [ProtoHover.State.provide()],
 })
 export class ProtoHover {
-  private readonly config = HoverProto.injectConfig();
+  private static readonly Proto = protoFor(ProtoHover);
+  static readonly State = ProtoHover.Proto.state;
+  static readonly Config = ProtoHover.Proto.config; // Only if config exists
+  static readonly Hooks = ProtoHover.Proto.hooks;
+
+  readonly config = ProtoHover.Config.inject();
 
   // Inputs as signals
-  readonly disabled = input<boolean, BooleanInput>(false, {
+  readonly disabled = input<boolean, BooleanInput>(this.config.disabled, {
     transform: booleanAttribute,
     alias: 'protoHoverDisabled',
   });
 
   // Initialize proto state
-  readonly state = HoverProto.initState(this);
+  readonly state = ProtoHover.Proto(this);
 
   // Use afterRenderEffect for DOM lifecycle
   constructor() {
@@ -58,14 +63,14 @@ export class ProtoHover {
 }
 ```
 
-**Key Proto System APIs:**
+**Key Proto System APIs (static on directive class):**
 
-- `createProto<T, N, C>()` — Creates protocol for directive/component
-- `Proto.provideState()` — Provider that creates ProtoState and registers in ancestry
-- `Proto.initState(this)` — Wraps InputSignals into ControlledInputs, sets state
-- `Proto.injectState()` — Retrieves proto state from DI
-- `Proto.provideConfig()` / `injectConfig()` — Hierarchical config with merging
-- `controlledInput()` — Wraps InputSignal with programmatic control
+- `MyDirective.State.provide()` — Provider that creates ProtoState and registers in ancestry
+- `MyDirective.State.inject()` — Retrieves proto state from DI
+- `MyDirective.Config.provide(cfg)` — Provides hierarchical config (only if proto has config)
+- `MyDirective.Config.inject()` — Injects merged configuration
+- `MyDirective.Hooks.provide(...hooks)` — Provides lifecycle hooks
+- `MyDirective.Proto(this)` — Wraps InputSignals into ControlledInputs, sets state
 
 **Ancestry Chain:**
 Protos track hierarchy via `PROTO_ANCESTRY_CHAIN`. This enables parent/ancestor lookups for composed directives.

@@ -23,9 +23,7 @@ export interface PressConfig {
   defaultDisabled: boolean;
 }
 
-export const PressProto = createProto<ProtoPress, PressConfig>('Press', {
-  defaultDisabled: false,
-});
+const protoFor = createProto<ProtoPress, PressConfig>({ defaultDisabled: false });
 
 /**
  * Directive that tracks press/active state during pointer interactions.
@@ -66,10 +64,15 @@ export const PressProto = createProto<ProtoPress, PressConfig>('Press', {
     '[attr.data-press]': "isPressed() ? '' : null",
     '(pointerdown)': 'onPointerDown($event)',
   },
-  providers: [PressProto.provideState()],
+  providers: [ProtoPress.State.provide()],
 })
 export class ProtoPress {
-  private readonly config = PressProto.injectConfig();
+  private static readonly Proto = protoFor(ProtoPress);
+  static readonly State = ProtoPress.Proto.state;
+  static readonly Config = ProtoPress.Proto.config;
+  static readonly Hooks = ProtoPress.Proto.hooks;
+
+  readonly config = ProtoPress.Config.inject();
   private readonly platformId = inject(PLATFORM_ID);
   private readonly document = inject(DOCUMENT);
   private readonly elementRef = injectElementRef();
@@ -106,10 +109,7 @@ export class ProtoPress {
    */
   private cleanupListeners: (() => void)[] = [];
 
-  /**
-   * The state of the press directive.
-   */
-  readonly state = PressProto.initState(this);
+  readonly state = ProtoPress.Proto(this);
 
   constructor() {
     // Watch for disabled state changes and reset press when disabled becomes true

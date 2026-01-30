@@ -36,26 +36,30 @@ import { injectProtoAncestor, injectProtoParent } from './proto-ancestry';
 
 describe('createProto', () => {
   describe('basic state management', () => {
-    const DirProto = createProto<Dir>('Dir');
+    const protoForDir = createProto<Dir>();
 
     @Directive({
       selector: '[dir]',
       exportAs: 'dir',
-      providers: [DirProto.provideState()],
+      providers: [Dir.State.provide()],
     })
     class Dir {
+      private static readonly Proto = protoForDir(Dir);
+      static readonly State = Dir.Proto.state;
+      static readonly Hooks = Dir.Proto.hooks;
+
       readonly disabled = input<boolean, BooleanInput>(false, { transform: booleanAttribute });
       readonly enabled = computed(() => !this.disabled());
-      readonly state = DirProto.initState(this);
+      readonly state = Dir.Proto(this);
     }
 
-    const CompProto = createProto<Comp>('Comp');
+    const protoForComp = createProto<Comp>();
 
     @Component({
       selector: 'test-comp',
       changeDetection: ChangeDetectionStrategy.OnPush,
       imports: [Dir],
-      providers: [CompProto.provideState()],
+      providers: [Comp.State.provide()],
       template: `
         <div #dir1="dir" dir [disabled]="dir1Disabled()">
           <div #dir2="dir" dir [disabled]="dir2Disabled()"></div>
@@ -63,6 +67,10 @@ describe('createProto', () => {
       `,
     })
     class Comp {
+      private static readonly Proto = protoForComp(Comp);
+      static readonly State = Comp.Proto.state;
+      static readonly Hooks = Comp.Proto.hooks;
+
       readonly dir1 = viewChild.required('dir1', { read: Dir });
       readonly dir1State = computed(() => this.dir1().state());
       readonly dir1Disabled = signal(false);
@@ -71,7 +79,7 @@ describe('createProto', () => {
       readonly dir2State = computed(() => this.dir2().state());
       readonly dir2Disabled = signal(false);
 
-      readonly compState = CompProto.initState(this);
+      readonly compState = Comp.Proto(this);
     }
 
     it('should have correct controlled signal values', async () => {
@@ -174,28 +182,36 @@ describe('createProto', () => {
   });
 
   describe('ancestry', () => {
-    const ParentProto = createProto<ParentDir>('ParentDir');
+    const protoForParent = createProto<ParentDir>();
 
     @Directive({
       selector: '[parent]',
       exportAs: 'parent',
-      providers: [ParentProto.provideState()],
+      providers: [ParentDir.State.provide()],
     })
     class ParentDir {
+      private static readonly Proto = protoForParent(ParentDir);
+      static readonly State = ParentDir.Proto.state;
+      static readonly Hooks = ParentDir.Proto.hooks;
+
       readonly value = input<string>('parent');
-      readonly state = ParentProto.initState(this);
+      readonly state = ParentDir.Proto(this);
     }
 
-    const ChildProto = createProto<ChildDir>('ChildDir');
+    const protoForChild = createProto<ChildDir>();
 
     @Directive({
       selector: '[child]',
       exportAs: 'child',
-      providers: [ChildProto.provideState()],
+      providers: [ChildDir.State.provide()],
     })
     class ChildDir {
+      private static readonly Proto = protoForChild(ChildDir);
+      static readonly State = ChildDir.Proto.state;
+      static readonly Hooks = ChildDir.Proto.hooks;
+
       readonly value = input<string>('child');
-      readonly state = ChildProto.initState(this);
+      readonly state = ChildDir.Proto(this);
     }
 
     @Component({
@@ -280,22 +296,22 @@ describe('createProto', () => {
       const { fixture } = await render(TestAncestryComp);
       const { p1, p2, c2 } = fixture.componentInstance;
 
-      // c2 can find p3 by ParentProto.token (gets nearest)
-      const foundParent = c2().state.ancestry.parentOfType(ParentProto.token);
+      // c2 can find p3 by ParentDir.State.token (gets nearest)
+      const foundParent = c2().state.ancestry.parentOfType(ParentDir.State.token);
       expect(foundParent).not.toBeNull();
       // Type-safe: foundParent.state() has proper type
       expect(foundParent?.state().value()).toBe('p3');
 
-      // c2 can find c1 by ChildProto.token
-      const foundChild = c2().state.ancestry.parentOfType(ChildProto.token);
+      // c2 can find c1 by ChildDir.State.token
+      const foundChild = c2().state.ancestry.parentOfType(ChildDir.State.token);
       expect(foundChild).not.toBeNull();
       expect(foundChild?.state).toBe(fixture.componentInstance.c1().state);
 
-      // p1 cannot find any ParentProto ancestor
-      expect(p1().state.ancestry.parentOfType(ParentProto.token)).toBeNull();
+      // p1 cannot find any ParentDir ancestor
+      expect(p1().state.ancestry.parentOfType(ParentDir.State.token)).toBeNull();
 
       // p2 can find p1
-      const p2FoundParent = p2().state.ancestry.parentOfType(ParentProto.token);
+      const p2FoundParent = p2().state.ancestry.parentOfType(ParentDir.State.token);
       expect(p2FoundParent?.state).toBe(p1().state);
     });
 
@@ -331,14 +347,14 @@ describe('createProto', () => {
       const { p1, p2, p3, c2 } = fixture.componentInstance;
 
       // c2's Parent ancestors are [p3, p2, p1] (nearest first)
-      const c2ParentAncestors = c2().state.ancestry.ancestorsOfType(ParentProto.token);
+      const c2ParentAncestors = c2().state.ancestry.ancestorsOfType(ParentDir.State.token);
       expect(c2ParentAncestors.length).toBe(3);
       expect(c2ParentAncestors[0].state).toBe(p3().state);
       expect(c2ParentAncestors[1].state).toBe(p2().state);
       expect(c2ParentAncestors[2].state).toBe(p1().state);
 
       // p1 has no Parent ancestors
-      expect(p1().state.ancestry.ancestorsOfType(ParentProto.token)).toEqual([]);
+      expect(p1().state.ancestry.ancestorsOfType(ParentDir.State.token)).toEqual([]);
     });
 
     it('ancestry.all() with predicate should filter ancestors', async () => {
@@ -369,28 +385,36 @@ describe('createProto', () => {
   });
 
   describe('children', () => {
-    const ParentProto = createProto<ParentDir>('ParentDir');
+    const protoForParent = createProto<ParentDir>();
 
     @Directive({
       selector: '[parent]',
       exportAs: 'parent',
-      providers: [ParentProto.provideState()],
+      providers: [ParentDir.State.provide()],
     })
     class ParentDir {
+      private static readonly Proto = protoForParent(ParentDir);
+      static readonly State = ParentDir.Proto.state;
+      static readonly Hooks = ParentDir.Proto.hooks;
+
       readonly value = input<string>('parent');
-      readonly state = ParentProto.initState(this);
+      readonly state = ParentDir.Proto(this);
     }
 
-    const ChildProto = createProto<ChildDir>('ChildDir');
+    const protoForChild = createProto<ChildDir>();
 
     @Directive({
       selector: '[child]',
       exportAs: 'child',
-      providers: [ChildProto.provideState()],
+      providers: [ChildDir.State.provide()],
     })
     class ChildDir {
+      private static readonly Proto = protoForChild(ChildDir);
+      static readonly State = ChildDir.Proto.state;
+      static readonly Hooks = ChildDir.Proto.hooks;
+
       readonly value = input<string>('child');
-      readonly state = ChildProto.initState(this);
+      readonly state = ChildDir.Proto(this);
     }
 
     @Component({
@@ -471,22 +495,22 @@ describe('createProto', () => {
       const { p1, p2, p3, c1, c2 } = fixture.componentInstance;
 
       // p1's ChildDir descendants are [c1, c2] (all ChildDir descendants)
-      const p1ChildChildren = p1().state.ancestry.childrenOfType(ChildProto.token)();
+      const p1ChildChildren = p1().state.ancestry.childrenOfType(ChildDir.State.token)();
       expect(p1ChildChildren.length).toBe(2);
       expect(p1ChildChildren[0].state).toBe(c1().state);
       expect(p1ChildChildren[1].state).toBe(c2().state);
 
       // p2's ChildDir descendants are [c1] only (c2 is not under p2)
-      const p2ChildChildren = p2().state.ancestry.childrenOfType(ChildProto.token)();
+      const p2ChildChildren = p2().state.ancestry.childrenOfType(ChildDir.State.token)();
       expect(p2ChildChildren.length).toBe(1);
       expect(p2ChildChildren[0].state).toBe(c1().state);
 
       // p3 has no ChildDir descendants
-      const p3ChildChildren = p3().state.ancestry.childrenOfType(ChildProto.token)();
+      const p3ChildChildren = p3().state.ancestry.childrenOfType(ChildDir.State.token)();
       expect(p3ChildChildren.length).toBe(0);
 
       // c2's ParentDir descendants are [p4]
-      const c2ParentChildren = c2().state.ancestry.childrenOfType(ParentProto.token)();
+      const c2ParentChildren = c2().state.ancestry.childrenOfType(ParentDir.State.token)();
       expect(c2ParentChildren.length).toBe(1);
       expect(c2ParentChildren[0].state).toBe(fixture.componentInstance.p4().state);
     });
@@ -527,8 +551,8 @@ describe('createProto', () => {
       const { p1, c1, c2 } = fixture.componentInstance;
 
       // Get childrenOfType signal twice with same token
-      const signal1 = p1().state.ancestry.childrenOfType(ChildProto.token);
-      const signal2 = p1().state.ancestry.childrenOfType(ChildProto.token);
+      const signal1 = p1().state.ancestry.childrenOfType(ChildDir.State.token);
+      const signal2 = p1().state.ancestry.childrenOfType(ChildDir.State.token);
 
       // Should return the exact same signal instance (cached)
       expect(signal1).toBe(signal2);
@@ -556,26 +580,34 @@ describe('createProto', () => {
   });
 
   describe('injectAncestorState', () => {
-    const OuterProto = createProto<OuterDir>('OuterDir');
+    const protoForOuter = createProto<OuterDir>();
 
     @Directive({
       selector: '[outer]',
-      providers: [OuterProto.provideState()],
+      providers: [OuterDir.State.provide()],
     })
     class OuterDir {
+      private static readonly Proto = protoForOuter(OuterDir);
+      static readonly State = OuterDir.Proto.state;
+      static readonly Hooks = OuterDir.Proto.hooks;
+
       readonly value = input<string>('outer');
-      readonly state = OuterProto.initState(this);
+      readonly state = OuterDir.Proto(this);
     }
 
-    const InnerProto = createProto<InnerDir>('InnerDir');
+    const protoForInner = createProto<InnerDir>();
 
     @Directive({
       selector: '[inner]',
-      providers: [InnerProto.provideState()],
+      providers: [InnerDir.State.provide()],
     })
     class InnerDir {
-      readonly outerState = injectProtoAncestor(OuterProto.token);
-      readonly state = InnerProto.initState(this);
+      private static readonly Proto = protoForInner(InnerDir);
+      static readonly State = InnerDir.Proto.state;
+      static readonly Hooks = InnerDir.Proto.hooks;
+
+      readonly outerState = injectProtoAncestor(OuterDir.State.token);
+      readonly state = InnerDir.Proto(this);
     }
 
     @Component({
@@ -602,16 +634,20 @@ describe('createProto', () => {
   });
 
   describe('injectParentState', () => {
-    const ItemProto = createProto<ItemDir>('ItemDir');
+    const protoForItem = createProto<ItemDir>();
 
     @Directive({
       selector: '[item]',
-      providers: [ItemProto.provideState()],
+      providers: [ItemDir.State.provide()],
     })
     class ItemDir {
-      readonly parentItem = injectProtoParent(ItemProto.token, { optional: true });
+      private static readonly Proto = protoForItem(ItemDir);
+      static readonly State = ItemDir.Proto.state;
+      static readonly Hooks = ItemDir.Proto.hooks;
+
+      readonly parentItem = injectProtoParent(ItemDir.State.token, { optional: true });
       readonly value = input<string>('item');
-      readonly state = ItemProto.initState(this);
+      readonly state = ItemDir.Proto(this);
     }
 
     @Component({
@@ -654,7 +690,7 @@ describe('createProto', () => {
       hookValue?: string;
     }
 
-    const HookProto = createProto<HookDir, TestHookConfig>('Hook', { hookValue: 'default' });
+    const protoForHook = createProto<HookDir, TestHookConfig>({ hookValue: 'default' });
 
     let hookCalls: string[] = [];
     let afterRenderCalls: string[] = [];
@@ -662,8 +698,8 @@ describe('createProto', () => {
     @Directive({
       selector: '[hook]',
       providers: [
-        HookProto.provideState(),
-        HookProto.provideHooks(
+        HookDir.State.provide(),
+        HookDir.Hooks.provide(
           state => {
             // Simple synchronous hook
             hookCalls.push(`hook:${state.protoName}:${state.config.hookValue}`);
@@ -678,15 +714,20 @@ describe('createProto', () => {
       ],
     })
     class HookDir {
+      private static readonly Proto = protoForHook(HookDir);
+      static readonly State = HookDir.Proto.state;
+      static readonly Config = HookDir.Proto.config;
+      static readonly Hooks = HookDir.Proto.hooks;
+
       readonly value = input<string>('hook');
-      readonly state = HookProto.initState(this);
+      readonly state = HookDir.Proto(this);
     }
 
     @Component({
       selector: 'test-hooks',
       changeDetection: ChangeDetectionStrategy.OnPush,
       imports: [HookDir],
-      providers: [HookProto.provideConfig({ hookValue: 'custom' })],
+      providers: [HookDir.Config.provide({ hookValue: 'custom' })],
       template: `
         <div #hook hook></div>
       `,
@@ -704,7 +745,7 @@ describe('createProto', () => {
       // Hooks run synchronously during set(), no async waiting needed
       await render(TestHooksComp);
 
-      expect(hookCalls).toContain('hook:Hook:custom');
+      expect(hookCalls).toContain('hook:HookDir:custom');
     });
 
     it('should allow hooks to schedule afterNextRender', async () => {
@@ -714,7 +755,7 @@ describe('createProto', () => {
       // afterRender is called via afterNextRender
       await fixture.whenStable();
 
-      expect(afterRenderCalls).toContain('afterRender:Hook:custom');
+      expect(afterRenderCalls).toContain('afterRender:HookDir:custom');
     });
   });
 
@@ -724,18 +765,23 @@ describe('createProto', () => {
       max: number;
     }
 
-    const CounterProto = createProto<CounterDir, CounterConfig>('CounterDir', {
+    const protoForCounter = createProto<CounterDir, CounterConfig>({
       min: 0,
       max: 100,
     });
 
     @Directive({
       selector: '[counter]',
-      providers: [CounterProto.provideState()],
+      providers: [CounterDir.State.provide()],
     })
     class CounterDir {
-      readonly config = CounterProto.injectConfig();
-      readonly state = CounterProto.initState(this);
+      private static readonly Proto = protoForCounter(CounterDir);
+      static readonly State = CounterDir.Proto.state;
+      static readonly Config = CounterDir.Proto.config;
+      static readonly Hooks = CounterDir.Proto.hooks;
+
+      readonly config = CounterDir.Config.inject();
+      readonly state = CounterDir.Proto(this);
     }
 
     @Component({
@@ -754,7 +800,7 @@ describe('createProto', () => {
       selector: 'test-custom-config',
       changeDetection: ChangeDetectionStrategy.OnPush,
       imports: [CounterDir],
-      providers: [CounterProto.provideConfig({ min: 10, max: 50 })],
+      providers: [CounterDir.Config.provide({ min: 10, max: 50 })],
       template: `
         <div #counter counter></div>
       `,
@@ -796,12 +842,28 @@ describe('createProto', () => {
       d: 0,
     };
 
-    const TestProto = createProto<ProtoTest, typeof testConfig>('TestProto', testConfig);
+    const protoForTest = createProto<ProtoTestComp, typeof testConfig>(testConfig);
 
+    // Define the main component first so its static members are available
+    @Component({
+      selector: 'proto-test',
+      changeDetection: ChangeDetectionStrategy.OnPush,
+      template: ``,
+    })
+    class ProtoTestComp {
+      private static readonly Proto = protoForTest(ProtoTestComp);
+      static readonly State = ProtoTestComp.Proto.state;
+      static readonly Config = ProtoTestComp.Proto.config;
+      static readonly Hooks = ProtoTestComp.Proto.hooks;
+
+      readonly config = ProtoTestComp.Config.inject();
+    }
+
+    // Now define the host directives that reference ProtoTestComp.Config
     @Directive({
       selector: '[protoTestGrandparent]',
       providers: [
-        TestProto.provideConfig({
+        ProtoTestComp.Config.provide({
           a: {
             a: 1,
           },
@@ -814,7 +876,7 @@ describe('createProto', () => {
       selector: '[protoTestParent]',
       hostDirectives: [ProtoTestGrandparent],
       providers: [
-        TestProto.provideConfig({
+        ProtoTestComp.Config.provide({
           b: {
             a: 2,
             b: 2,
@@ -824,13 +886,14 @@ describe('createProto', () => {
     })
     class ProtoTestParent {}
 
+    // Create a wrapper component that applies the host directives
     @Component({
-      selector: 'proto-test',
+      selector: 'proto-test-wrapper',
       changeDetection: ChangeDetectionStrategy.OnPush,
       hostDirectives: [ProtoTestParent],
       providers: [
-        TestProto.provideState(),
-        TestProto.provideConfig({
+        ProtoTestComp.State.provide(),
+        ProtoTestComp.Config.provide({
           a: {
             b: 3,
           },
@@ -843,12 +906,12 @@ describe('createProto', () => {
       ],
       template: ``,
     })
-    class ProtoTest {
-      readonly config = TestProto.injectConfig();
+    class ProtoTestWrapper {
+      readonly config = ProtoTestComp.Config.inject();
     }
 
     it('should inherit config from grandparent', async () => {
-      const { fixture } = await render(ProtoTest);
+      const { fixture } = await render(ProtoTestWrapper);
       const config = fixture.componentInstance.config;
 
       expect(config).toEqual({
@@ -869,14 +932,14 @@ describe('createProto', () => {
   });
 
   describe('state inheritance with hooks', () => {
-    const NestedProto = createProto<NestedDir>('NestedDir');
+    const protoForNested = createProto<NestedDir>();
 
     @Directive({
       selector: '[nested]',
       exportAs: 'nested',
       providers: [
-        NestedProto.provideState(),
-        NestedProto.provideHooks(state => {
+        NestedDir.State.provide(),
+        NestedDir.Hooks.provide(state => {
           effect(() => {
             // Use type-safe parent() to get immediate parent of same type
             const parent = state.ancestry.parent;
@@ -891,9 +954,13 @@ describe('createProto', () => {
       ],
     })
     class NestedDir {
+      private static readonly Proto = protoForNested(NestedDir);
+      static readonly State = NestedDir.Proto.state;
+      static readonly Hooks = NestedDir.Proto.hooks;
+
       readonly disabled = input<boolean, BooleanInput>(false, { transform: booleanAttribute });
       readonly enabled = computed(() => !this.disabled());
-      readonly state = NestedProto.initState(this);
+      readonly state = NestedDir.Proto(this);
     }
 
     @Component({

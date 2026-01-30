@@ -6,7 +6,7 @@ import {
   isNativeInputTag,
 } from '@angular-proto/core/utils';
 import { computed, Directive, input } from '@angular/core';
-import { createProtoInteractDefaultConfig, InteractProto } from './interact';
+import { createProtoInteractDefaultConfig, ProtoInteract } from './interact';
 
 export interface ProtoInteractButtonConfig {
   /**
@@ -38,15 +38,12 @@ export interface ProtoInteractButtonConfig {
   activateOnKeydownEnter: boolean;
 }
 
-export const ProtoInteractButtonProto = createProto<ProtoInteractButton, ProtoInteractButtonConfig>(
-  'InteractButton',
-  {
-    roleFallback: true,
-    typeFallback: true,
-    activateOnKeyupSpace: true,
-    activateOnKeydownEnter: true,
-  },
-);
+const protoFor = createProto<ProtoInteractButton, ProtoInteractButtonConfig>({
+  roleFallback: true,
+  typeFallback: true,
+  activateOnKeyupSpace: true,
+  activateOnKeydownEnter: true,
+});
 
 /**
  * An extension of the `ProtoInteract` directive that provides button-specific behavior.
@@ -61,8 +58,8 @@ export const ProtoInteractButtonProto = createProto<ProtoInteractButton, ProtoIn
     '(keyup)': 'onKeyup($event)',
   },
   providers: [
-    ProtoInteractButtonProto.provideState(),
-    InteractProto.provideConfig(
+    ProtoInteractButton.State.provide(),
+    ProtoInteract.Config.provide(
       createProtoInteractDefaultConfig({
         fallbackTabIndex: 0,
         allEvents: {
@@ -74,8 +71,13 @@ export const ProtoInteractButtonProto = createProto<ProtoInteractButton, ProtoIn
   ],
 })
 export class ProtoInteractButton {
-  readonly config = ProtoInteractButtonProto.injectConfig();
-  readonly protoInteract = InteractProto.injectState();
+  private static readonly Proto = protoFor(ProtoInteractButton);
+  static readonly State = ProtoInteractButton.Proto.state;
+  static readonly Config = ProtoInteractButton.Proto.config;
+  static readonly Hooks = ProtoInteractButton.Proto.hooks;
+
+  readonly config = ProtoInteractButton.Config.inject();
+  readonly protoInteract = ProtoInteract.State.inject();
   readonly elementRef = injectElementRef();
 
   /**

@@ -1,13 +1,9 @@
 export {
-  // Anchor Arrow Proto & Directive
-  AnchorArrowProto,
-  // Anchor Proto & Directive
-  AnchorProto,
-  // Anchor Target Proto & Directives
-  AnchorTargetProto,
   // Context
   PROTO_ANCHOR_CONTEXT,
+  // Anchor Directive
   ProtoAnchor,
+  // Anchor Arrow Directive
   ProtoAnchorArrow,
   // Structural directive
   ProtoAnchorTarget,

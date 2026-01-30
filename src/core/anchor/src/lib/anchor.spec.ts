@@ -675,13 +675,14 @@ describe('utility functions', () => {
 // ============================================================================
 
 describe('Proto integration', () => {
-  it('should create AnchorProto state', async () => {
+  it('should create ProtoAnchor state', async () => {
     const { fixture } = await render(TestAnchorBasic);
     const { anchor } = fixture.componentInstance;
 
     const state = anchor().state;
     expect(state).toBeDefined();
-    expect(state.protoName).toBe('Anchor');
+    // Class names may have numeric suffixes in test environments due to JIT compilation
+    expect(state.protoName).toMatch(/^ProtoAnchor\d*$/);
   });
 
   it('should render target when anchor opens', async () => {

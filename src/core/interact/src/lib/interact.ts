@@ -89,10 +89,7 @@ export function createProtoInteractDefaultConfig(
   };
 }
 
-export const InteractProto = createProto<ProtoInteract, ProtoInteractConfig>(
-  'Interact',
-  createProtoInteractDefaultConfig,
-);
+const protoFor = createProto<ProtoInteract, ProtoInteractConfig>(createProtoInteractDefaultConfig);
 
 /**
  * Base interactive directive providing common states and accessibility features.
@@ -142,10 +139,15 @@ export const InteractProto = createProto<ProtoInteract, ProtoInteractConfig>(
     '[attr.data-disabled]': 'dataDisabledAttr()',
     '[attr.data-disabled-focusable]': 'dataDisabledFocusableAttr()',
   },
-  providers: [InteractProto.provideState()],
+  providers: [ProtoInteract.State.provide()],
 })
 export class ProtoInteract {
-  readonly config = InteractProto.injectConfig();
+  private static readonly Proto = protoFor(ProtoInteract);
+  static readonly State = ProtoInteract.Proto.state;
+  static readonly Config = ProtoInteract.Proto.config;
+  static readonly Hooks = ProtoInteract.Proto.hooks;
+
+  readonly config = ProtoInteract.Config.inject();
   readonly elementRef = injectElementRef();
 
   /**
@@ -277,7 +279,7 @@ export class ProtoInteract {
    * The elemental state object for this element.
    * Provides controlled signals that can be programmatically overridden.
    */
-  readonly state = InteractProto.initState(this);
+  readonly state = ProtoInteract.Proto(this);
 
   /**
    * Handles click events when disabled.

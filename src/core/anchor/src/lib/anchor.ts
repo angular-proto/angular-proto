@@ -173,10 +173,7 @@ export interface ProtoAnchorContext {
 // ProtoAnchor Directive
 // ============================================================================
 
-export const AnchorProto = createProto<ProtoAnchor, ProtoAnchorConfig>(
-  'Anchor',
-  defaultAnchorConfig,
-);
+const protoForAnchor = createProto<ProtoAnchor, ProtoAnchorConfig>(defaultAnchorConfig);
 
 /**
  * Directive that marks an element as an anchor for positioning overlays.
@@ -227,11 +224,11 @@ export const AnchorProto = createProto<ProtoAnchor, ProtoAnchorConfig>(
     '[attr.data-anchor-open]': "isOpen() ? '' : null",
   },
   providers: [
-    AnchorProto.provideState(),
+    ProtoAnchor.State.provide(),
     {
       provide: PROTO_ANCHOR_CONTEXT,
       useFactory: () => {
-        const anchor = AnchorProto.injectState();
+        const anchor = ProtoAnchor.State.inject();
         return {
           get anchorName() {
             return anchor().anchorName();
@@ -249,7 +246,12 @@ export const AnchorProto = createProto<ProtoAnchor, ProtoAnchorConfig>(
   ],
 })
 export class ProtoAnchor {
-  private readonly config = AnchorProto.injectConfig();
+  private static readonly Proto = protoForAnchor(ProtoAnchor);
+  static readonly State = ProtoAnchor.Proto.state;
+  static readonly Config = ProtoAnchor.Proto.config;
+  static readonly Hooks = ProtoAnchor.Proto.hooks;
+
+  private readonly config = ProtoAnchor.Config.inject();
   private readonly elementRef = injectElementRef<HTMLElement>();
   private readonly _injector = inject(Injector);
 
@@ -347,10 +349,7 @@ export class ProtoAnchor {
     return type === null ? undefined : type;
   });
 
-  /**
-   * The proto state for this anchor.
-   */
-  readonly state = AnchorProto.initState(this);
+  readonly state = ProtoAnchor.Proto(this);
 
   constructor() {
     // Sync open state changes to output
@@ -461,8 +460,7 @@ export interface ProtoAnchorTargetContext {
 // ProtoAnchorTarget Structural Directive
 // ============================================================================
 
-export const AnchorTargetProto = createProto<ProtoAnchorTarget, ProtoAnchorTargetConfig>(
-  'AnchorTarget',
+const protoForAnchorTarget = createProto<ProtoAnchorTarget, ProtoAnchorTargetConfig>(
   defaultTargetConfig,
 );
 
@@ -510,10 +508,15 @@ export const AnchorTargetProto = createProto<ProtoAnchorTarget, ProtoAnchorTarge
  */
 @Directive({
   selector: '[protoAnchorTarget]',
-  providers: [AnchorTargetProto.provideState()],
+  providers: [ProtoAnchorTarget.State.provide()],
 })
 export class ProtoAnchorTarget {
-  private readonly config = AnchorTargetProto.injectConfig();
+  private static readonly Proto = protoForAnchorTarget(ProtoAnchorTarget);
+  static readonly State = ProtoAnchorTarget.Proto.state;
+  static readonly Config = ProtoAnchorTarget.Proto.config;
+  static readonly Hooks = ProtoAnchorTarget.Proto.hooks;
+
+  private readonly config = ProtoAnchorTarget.Config.inject();
   private readonly templateRef = inject(TemplateRef<ProtoAnchorTargetContext>);
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly document = inject(DOCUMENT);
@@ -642,10 +645,7 @@ export class ProtoAnchorTarget {
     return this.anchor().visibility();
   });
 
-  /**
-   * The proto state for this anchor target.
-   */
-  readonly state = AnchorTargetProto.initState(this);
+  readonly state = ProtoAnchorTarget.Proto(this);
 
   constructor() {
     // Effect to manage the view based on anchor's isOpen state
@@ -1075,8 +1075,7 @@ const defaultArrowConfig: ProtoAnchorArrowConfig = {
   defaultHeight: 5,
 };
 
-export const AnchorArrowProto = createProto<ProtoAnchorArrow, ProtoAnchorArrowConfig>(
-  'AnchorArrow',
+const protoForAnchorArrow = createProto<ProtoAnchorArrow, ProtoAnchorArrowConfig>(
   defaultArrowConfig,
 );
 
@@ -1126,10 +1125,15 @@ export const AnchorArrowProto = createProto<ProtoAnchorArrow, ProtoAnchorArrowCo
     '[style.height.px]': 'height()',
     '[attr.data-anchor-arrow]': "''",
   },
-  providers: [AnchorArrowProto.provideState()],
+  providers: [ProtoAnchorArrow.State.provide()],
 })
 export class ProtoAnchorArrow {
-  private readonly config = AnchorArrowProto.injectConfig();
+  private static readonly Proto = protoForAnchorArrow(ProtoAnchorArrow);
+  static readonly State = ProtoAnchorArrow.Proto.state;
+  static readonly Config = ProtoAnchorArrow.Proto.config;
+  static readonly Hooks = ProtoAnchorArrow.Proto.hooks;
+
+  private readonly config = ProtoAnchorArrow.Config.inject();
 
   /**
    * Width of the arrow in pixels.
@@ -1147,10 +1151,7 @@ export class ProtoAnchorArrow {
     alias: 'protoAnchorArrowHeight',
   });
 
-  /**
-   * The proto state for this arrow.
-   */
-  readonly state = AnchorArrowProto.initState(this);
+  readonly state = ProtoAnchorArrow.Proto(this);
 }
 
 // ============================================================================

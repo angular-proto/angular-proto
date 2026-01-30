@@ -177,36 +177,3 @@ export function supportsDisabledAttribute(
 ): elementRef is ElementRef<HTMLElement & { disabled: boolean }> {
   return elementRef.nativeElement instanceof HTMLElement && 'disabled' in elementRef.nativeElement;
 }
-
-/**
- * Checks if the current environment matches any of the provided values.
- * @param env - List of environments to check ('development', 'production', 'test')
- * @returns True if the current environment is one of the provided values.
- */
-export function isEnv(...env: ('development' | 'production' | 'test')[]): boolean {
-  return env.includes(process.env['NODE_ENV'] as (typeof env)[number]);
-}
-
-/**
- * Checks if the current environment is 'test'.
- * @returns True if environment is 'test'.
- */
-export function isTest(): boolean {
-  return isEnv('test');
-}
-
-/**
- * Checks if the current environment is 'development'.
- * @returns True if environment is 'development'.
- */
-export function isDev(): boolean {
-  return isEnv('development');
-}
-
-/**
- * Checks if the current environment is 'production'.
- * @returns True if environment is 'production'.
- */
-export function isProd(): boolean {
-  return isEnv('production');
-}

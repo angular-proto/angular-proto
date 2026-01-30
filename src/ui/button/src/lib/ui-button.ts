@@ -5,11 +5,11 @@ import { ProtoInteract, ProtoInteractButton } from '@angular-proto/core/interact
 import { ProtoPress } from '@angular-proto/core/press';
 import { Directive, effect } from '@angular/core';
 
-const protoFor = createProto<PrimitiveButton>();
+const protoFor = createProto<UiButton>();
 
 @Directive({
-  selector: '[primitiveButton]',
-  exportAs: 'primitiveButton',
+  selector: '[uiButton]',
+  exportAs: 'uiButton',
   hostDirectives: [
     ProtoHover,
     ProtoPress,
@@ -29,7 +29,7 @@ const protoFor = createProto<PrimitiveButton>();
     },
   ],
   providers: [
-    PrimitiveButton.State.provide(),
+    UiButton.State.provide(),
     ProtoInteract.Hooks.provide(state => {
       const ngpHover = ProtoHover.State.inject({ self: true });
       const ngpPress = ProtoPress.State.inject({ self: true });
@@ -45,10 +45,10 @@ const protoFor = createProto<PrimitiveButton>();
     }),
   ],
 })
-export class PrimitiveButton {
-  private static readonly Proto = protoFor(PrimitiveButton);
-  static readonly State = PrimitiveButton.Proto.state;
-  static readonly Hooks = PrimitiveButton.Proto.hooks;
+export class UiButton {
+  private static readonly Proto = protoFor(UiButton);
+  static readonly State = UiButton.Proto.state;
+  static readonly Hooks = UiButton.Proto.hooks;
 
-  readonly state = PrimitiveButton.Proto(this);
+  readonly state = UiButton.Proto(this);
 }

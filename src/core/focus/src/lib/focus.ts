@@ -31,7 +31,7 @@ export interface ProtoFocusConfig {
   defaultCheckChildren: boolean;
 }
 
-export const FocusProto = createProto<ProtoFocus, ProtoFocusConfig>('Focus', {
+const protoFor = createProto<ProtoFocus, ProtoFocusConfig>({
   defaultDisabled: false,
   defaultCheckChildren: false,
 });
@@ -68,10 +68,15 @@ export const FocusProto = createProto<ProtoFocus, ProtoFocusConfig>('Focus', {
   host: {
     '[attr.data-focus]': "isFocused() ? '' : null",
   },
-  providers: [FocusProto.provideState()],
+  providers: [ProtoFocus.State.provide()],
 })
 export class ProtoFocus {
-  private readonly config = FocusProto.injectConfig();
+  private static readonly Proto = protoFor(ProtoFocus);
+  static readonly State = ProtoFocus.Proto.state;
+  static readonly Config = ProtoFocus.Proto.config;
+  static readonly Hooks = ProtoFocus.Proto.hooks;
+
+  readonly config = ProtoFocus.Config.inject();
   private readonly elementRef = injectElementRef();
   private readonly focusMonitor = inject(FocusMonitor);
   private readonly injector = inject(Injector);
@@ -115,10 +120,7 @@ export class ProtoFocus {
    */
   readonly isFocused = this._isFocused.asReadonly();
 
-  /**
-   * The state of the focus directive.
-   */
-  readonly state = FocusProto.initState(this);
+  readonly state = ProtoFocus.Proto(this);
 
   constructor() {
     afterRenderEffect(

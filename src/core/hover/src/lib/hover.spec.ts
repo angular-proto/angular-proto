@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { render, screen } from '@testing-library/angular';
-import { HoverProto, ProtoHover } from './hover';
+import { ProtoHover } from './hover';
 
 describe('ProtoHover', () => {
   @Component({
@@ -97,7 +97,7 @@ describe('ProtoHover', () => {
 
   it('should not trigger hover when disabled by config', async () => {
     const { fixture, rerender } = await render(TestHoverComponent, {
-      providers: [HoverProto.provideConfig({ disabled: true })],
+      providers: [ProtoHover.Config.provide({ disabled: true })],
     });
     const element = screen.getByTestId('hover-element');
 

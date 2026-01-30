@@ -20,14 +20,15 @@
       "@angular-proto/core/focus-visible": ["src/core/focus-visible/src/index.ts"],
       "@angular-proto/core/hover": ["src/core/hover/src/index.ts"],
       "@angular-proto/core/press": ["src/core/press/src/index.ts"],
-      "@angular-proto/core/disable": ["src/core/disable/src/index.ts"],
       "@angular-proto/primitives": ["src/primitives/src/index.ts"],
       "@angular-proto/core/button": ["src/core/button/src/index.ts"],
       "@angular-proto/primitives/button": ["src/primitives/button/src/index.ts"],
       "@angular-proto/core/utils": ["src/core/utils/src/index.ts"],
       "@angular-proto/core/interact": ["src/core/interact/src/index.ts"],
       "@angular-proto/core/anchor": ["src/core/anchor/src/index.ts"],
-      "@angular-proto/primitives/tooltip": ["src/primitives/tooltip/src/index.ts"]
+      "@angular-proto/primitives/tooltip": ["src/primitives/tooltip/src/index.ts"],
+      "@angular-proto/ui": ["src/ui/src/index.ts"],
+      "@angular-proto/ui/button": ["src/ui/button/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
